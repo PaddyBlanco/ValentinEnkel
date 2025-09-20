@@ -1,0 +1,12 @@
+a{
+    color: var(--color-highlight);
+    text-decoration: none;
+}
+
+a:hover{
+    text-decoration: underline;
+}
+
+button{
+    font-family: var(--font-family);
+}
