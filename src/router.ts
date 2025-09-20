@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import View_home from './views/view_home.vue'
-import View_Inprint from './views/view_inprint.vue'
-import View_privacy_policy from './views/view_privacy_policy.vue'
+import ViewHome from './views/viewHome.vue'
+import ViewInprint from './views/viewInprint.vue'
+import ViewPrivacyPolicy from './views/viewPrivacyPolicy.vue'
+
+
+
+
 
 
 const routes = [
-  { path: '/', name: 'Home', component: View_home },
-  { path: '/Impressum', name: 'Inprint', component: View_Inprint },
-  { path: '/Datenschutz', name: 'PrivacyPolicy', component: View_privacy_policy },
+  { path: '/Impressum', name: 'Inprint', component: ViewInprint },
+  { path: '/Impressum', name: 'Inprint', component: ViewHome },
+  { path: '/Datenschutz', name: 'PrivacyPolicy', component: ViewPrivacyPolicy },
 ]
 
 export const router = createRouter({

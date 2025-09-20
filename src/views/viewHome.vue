@@ -1,5 +1,5 @@
 <template>
- <Section_home_welcome></Section_home_welcome>
+ <Section_home_welcome/>
   <div class="html-demo">
     <h1>Übersicht HTML-Tags + Formularelemente</h1>
 
@@ -35,7 +35,7 @@
       <li>Liste ol/li – Eintrag 2</li>
     </ol>
 
-    <table border="1">
+    <table >
       <thead>
         <tr><th>Tabellenkopf th</th><th>Tabellenkopf th</th></tr>
       </thead>
@@ -79,10 +79,10 @@
   </div>
 </template>
 
-<script setup>
+<script  setup lang="ts">
 import Section_home_welcome from '../components/section-home/section_home_welcome.vue';
 
-// keine Logik notwendig
+
 </script>
 
 <style scoped>
