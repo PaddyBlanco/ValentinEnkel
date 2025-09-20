@@ -1,0 +1,19 @@
+Order Allow,Deny
+Allow from all
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  RewriteBase /
+
+  # wenn Datei oder Verzeichnis existiert, normal ausliefern
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # sonst alles auf index.html (z.B. SPA)
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Standard-Dokument
+DirectoryIndex index.html
