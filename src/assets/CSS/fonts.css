@@ -2,20 +2,18 @@
 @font-face {
   font-family: 'Cal Sans';
   src: url('../fonts/CalSans-Regular.ttf') format('truetype');
-  font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'DM Sans';
-  src: url('../fonts/DMSans.ttf') format('truetype');
-  font-weight: 400;
+  src: url('../fonts/DMSans-Regular.ttf') format('truetype');
   font-style: normal;
-}
+  font-weight: 100;
+} 
 
 @font-face {
   font-family: 'DM Sans Italic';
-  src: url('../fonts/DMSans.ttf') format('truetype');
-  font-weight: 400;
+  src: url('../fonts/DMSans-Italic.ttf') format('truetype');
   font-style: italic;
 }

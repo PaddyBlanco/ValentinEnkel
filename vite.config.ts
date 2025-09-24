@@ -4,5 +4,5 @@ import vue from '@vitejs/plugin-vue'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
-   base: '/ValentinEnkel/', // exakt so, entspricht deinem Repo-Namen
+  base: '/ValentinEnkel/', 
 })

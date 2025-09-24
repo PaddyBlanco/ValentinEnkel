@@ -1,18 +1,23 @@
 <template>
- <Section_home_welcome/>
+
+ <SectionHomeWelcome></SectionHomeWelcome>
+<SectionHomeServices></SectionHomeServices>
+<!-- 
   <div class="html-demo">
     <h1>Übersicht HTML-Tags + Formularelemente</h1>
 
     <h1>Überschrift h1</h1>
     <h2>Überschrift h2</h2>
-    <h3>Überschrift h3</h3>
-    <h4>Überschrift h4</h4>
-    <h5>Überschrift h5</h5>
-    <h6>Überschrift h6</h6>
+    
 
 
-    <p>Hier ist ein Normaler Text der bisl länger ist und cooler formatier <br> ich möchte auch mehere Zeilen ausprobieren</p>
+    <p>Hier ist ein Normaler Text der bisl länger ist und cooler formatier <br> 
+      ich möchte auch mehere Zeilen ausprobieren</p>
     <strong>Fett strong</strong><br>
+
+    <img src="/src/assets/Images/Logo/logo180x180.png" alt="Platzhalter Bild" />
+
+
     <b>Fett b</b><br>
     <em>Kursiv em</em><br>
     <i>Kursiv i</i><br>
@@ -42,10 +47,10 @@
       <tbody>
         <tr><td>Tabellenzelle td</td><td>Tabellenzelle td</td></tr>
       </tbody>
-    </table>
+    </table> -->
 
     <!-- Formular -->
-    <h2>Formular mit allen Input-Typen</h2>
+    <!-- <h2>Formular mit allen Input-Typen</h2>
     <form class="form-demo">
       <label>Text: <input type="text" placeholder="input[type=text]" /></label>
       <label>Password: <input type="password" placeholder="input[type=password]" /></label>
@@ -76,11 +81,14 @@
         <option>Option 2</option>
       </select>
     </form>
-  </div>
+  </div> -->
 </template>
 
 <script  setup lang="ts">
-import Section_home_welcome from '../components/section-home/section_home_welcome.vue';
+import SectionHomeServices from '../components/SectionHome/sectionHomeServices.vue';
+import SectionHomeWelcome from '../components/SectionHome/sectionHomeWelcome.vue';
+
+
 
 
 </script>

@@ -1,68 +1,58 @@
 
+.and{
+    font-family: 'DM Sans';
+    font-weight: bold;
+}
+
+section{
+    padding-inline:75px;
+}
 
 .monospace{
   font-family: 'Courier New', monospace;
-  font-size: 12pt;
+  font-size: 15pt;
 }
 
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cal Sans', sans-serif;
+    font-family: 'Cal Sans';
     margin: 0;
     font-weight: normal;
 }
 
-.and{
-    font-family: 'DM Sans', sans-serif;
-}
-
-
 h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 120px;
 }
 
-h2 {
-    font-size: 2rem;
-    font-weight: 600;
+h2{
+    font-size: 85px;
 }
 
 h3 {
-    font-size: 1.75rem;
-    font-weight: 500;
-}
-
-h4 {
-    font-size: 1.5rem;
-    font-weight: 500;
-}
-
-h5 {
-    font-size: 1.25rem;
-    font-weight: 400;
-}
-
-p{
-    font-size: 1rem;
-    line-height: 1.6;
-    margin: 0;
+    font-size: 63px; 
 }
 
 
-
-div{
-    width: 100%;
+img{
+    max-width: 100%;
+    height: auto;
 }
+
 
 .flex-row{
     display: flex;
     flex-direction: row;
 }
+
 .flex-item{
     flex: 1;
 }
 .felx-item-2{
     flex: 2;
+}
+.flex-center{
+    justify-content: center;
+    align-items: center;
 }
 
 .text-center{
@@ -77,3 +67,19 @@ div{
     text-align: left;
 }
 
+
+
+@media(max-width: 1000px){
+    h1{
+        font-size: 70px;
+    }
+    h2{
+        font-size: 50px;
+    }
+    h3{
+        font-size: 40px;
+    }
+    section{
+        padding-inline: 20px;
+    }
+}

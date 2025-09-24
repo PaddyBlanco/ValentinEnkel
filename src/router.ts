@@ -9,12 +9,12 @@ import ViewPrivacyPolicy from './views/viewPrivacyPolicy.vue'
 
 
 const routes = [
+  { path: '/', name: 'Home', component: ViewHome },
   { path: '/Impressum', name: 'Inprint', component: ViewInprint },
-  { path: '/Impressum', name: 'Inprint', component: ViewHome },
   { path: '/Datenschutz', name: 'PrivacyPolicy', component: ViewPrivacyPolicy },
 ]
 
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/ValentinEnkel/'),
   routes,
 })
