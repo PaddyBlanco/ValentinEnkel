@@ -1,10 +1,10 @@
 <template>
     <CompAnimatedGradient/>
     <section class="welcome-section">
-        <div class="welcome-text">
-        <TextRotator :words="['Lösungen', 'Gestaltung', 'Fortschritt', 'Innovation', 'Ideen']"
-                :interval="1800"
-                :duration="420"
+        <div class="reveal fade welcome-text" v-inview style="--rev-delay:150ms">
+        <TextRotatorFader :words="['Lösungen', 'Gestaltung', 'Fortschritt', 'Innovation', 'Ideen']"
+                :interval="2500"
+                :duration="1500"
                 easing="ease"
                 :pauseOnHover="true"
                 />
@@ -20,7 +20,8 @@
 
 <script setup lang="ts">
 import CompAnimatedGradient from './compAnimatedGradient.vue';
-import TextRotator from './TextRotator.vue';
+// import TextRotator from './TextRotator.vue';
+import TextRotatorFader from './TextRotatorFader.vue';
 
 </script>
 
@@ -31,12 +32,12 @@ import TextRotator from './TextRotator.vue';
     top:75vh;
     left:50%;
     height: 0;
-    width:1px;
+    width:var(--line-width);
     background: white;  
     transform: translateX(-50%);
     
-    animation: drawLine 2s ease-out forwards;
-    animation-delay: 2s;
+    animation: drawLine 1s ease-out forwards;
+    animation-delay: 1s;
 }
 
 @keyframes drawLine {

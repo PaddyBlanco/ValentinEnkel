@@ -1,0 +1,28 @@
+/* Grundzustand (unsichtbar) – einfach Klasse "reveal" vergeben */
+.reveal { opacity: 0; transform: translateY(14px); }
+
+.reveal.fade    { transform: none; }
+.reveal.up      { transform: translateY(14px); }
+.reveal.down    { transform: translateY(-14px); }
+.reveal.left    { transform: translateX(14px); }
+.reveal.right   { transform: translateX(-14px); }
+
+.reveal, .reveal * { will-change: opacity, transform; }
+
+/* Transition – Custom-Props erlauben per-Element Tuning */
+.reveal { 
+  transition:
+    opacity var(--rev-dur, 500ms) var(--rev-ease, ease),
+    transform var(--rev-dur, 500ms) var(--rev-ease, ease);
+}
+
+/* Sichtbar-Zustand: Directive toggelt .in-view */
+.in-view.reveal { opacity: 1; transform: none; }
+
+/* Stagger: einfach --rev-delay pro Item setzen (oder via nth-child) */
+.reveal { transition-delay: var(--rev-delay, 0ms); }
+
+/* Reduced motion: sofort sichtbar */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
