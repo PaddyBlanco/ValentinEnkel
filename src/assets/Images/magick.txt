@@ -1,0 +1,1 @@
+magick mogrify -resize 1920x -format webp *.jpg
