@@ -29,7 +29,9 @@
     --color: rgb(0, 0, 0);
     --font-size: 19px;
     --font-family: 'DM Sans';
-    --line-width: 0.5px;
+    --line-width: 0.1px;
+    --line-opacity:0.4;
+    
 }
 
 @media (prefers-color-scheme: dark) {

@@ -12,8 +12,8 @@
 /* Transition – Custom-Props erlauben per-Element Tuning */
 .reveal { 
   transition:
-    opacity var(--rev-dur, 500ms) var(--rev-ease, ease),
-    transform var(--rev-dur, 500ms) var(--rev-ease, ease);
+    opacity var(--rev-dur, 600ms) var(--rev-ease, ease),
+    transform var(--rev-dur, 600ms) var(--rev-ease, ease);
 }
 
 /* Sichtbar-Zustand: Directive toggelt .in-view */

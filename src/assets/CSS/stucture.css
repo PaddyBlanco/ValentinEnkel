@@ -6,6 +6,7 @@
 
 section{
     padding-inline:calc((100dvw - 1800px) / 2 + 100px);
+    position:relative;
 }
 
 .monospace{
@@ -38,10 +39,31 @@ img{
     height: auto;
 }
 
-
-.flex-row{
+.flex-row {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.flex-right {
+    justify-content: flex-end;
+    justify-items: flex-end;
+}
+
+.flex-bottom {
+    align-content: end;
+}
+
+.flex-top {
+    align-content: start;
+}
+
+.flex-center {
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
 }
 
 .flex-item{

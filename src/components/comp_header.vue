@@ -30,18 +30,14 @@
     ></div>
 
     <!-- Hauptnavigation: semantisch korrektes <nav>, bleibt immer im DOM (SEO) -->
-    <nav
-      id="primary-nav"
-      class="navigation"
-      :class="{ 'is-open': showNav }"
-      aria-label="Hauptnavigation"
-      :aria-hidden="!showNav"
-    >
-      <ul class="nav-list" role="list">
-        <li><a ref="firstLink" href="/about">About</a></li>
-        <li><a href="/projects">Projects</a></li>
-        <li><a href="/contact">Contact</a></li>
-      </ul>
+    <nav id="primary-nav" class="navigation" :class="{ 'is-open': showNav }"
+      aria-label="Hauptnavigation" :aria-hidden="!showNav">
+      <div class="nav-list" role="list">
+        <div><a ref="firstLink" href="/about">Home</a><span>Base</span></div>
+        <div><a href="/projects">Services</a><span>was wir anbieten</span></div>
+        <div><a href="/contact">Über uns</a><span>wer wir sind</span></div>
+        <div><a href="/contact">Kontakt</a><span>auf augenhöhe</span></div>
+      </div>
     </nav>
   </header>
 </template>
@@ -95,7 +91,26 @@ watch(
 </script>
 
 <style scoped>
-/* ===== Layout ===== */
+
+.nav-list{
+  width: 100%;
+  margin-block-end: 10rem;
+}
+
+.nav-list div{
+  flex: 0 0 100%;   
+  padding-inline-start: 20%;
+  border-bottom: 1px solid #ffffff55;
+}
+
+.nav-list div a{
+  font-size: 120px;
+  font-family: 'Cal Sans';
+    margin: 0;
+    font-weight: normal;
+}
+
+
 .site-header {
   position: relative;
   z-index: 100;
@@ -145,38 +160,30 @@ watch(
 /* Panel: animiert per transform (performant), nicht via width */
 .navigation {
   position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: end;
   top: 0;
   right: 0;
   height: 100svh;
-  width: min(50vw, 560px);
+  width: 50vw;
+  min-width: 1000px;
   max-width: 100%;
+  padding-block-start:10rem;
   background-color: var(--background-color, #111);
   transform: translateX(100%);
   transition: transform 260ms ease;
   z-index: 100;
-  display: flex;
-  align-items: center;
 }
 
 .navigation.is-open {
   transform: translateX(0);
 }
 
-.nav-list {
-  list-style: none;
-  margin: 0;
-  padding: 0 2rem;
-  display: grid;
-  gap: 1rem;
-  width: 100%;
-}
 
-.nav-list a {
-  display: inline-block;
-  font-size: 1.25rem;
-  text-decoration: none;
-  color: var(--text-on-bg, #fff);
-}
+
+
 
 
 .nav-icon {

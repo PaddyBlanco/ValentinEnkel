@@ -33,6 +33,7 @@ import TextRotatorFader from './TextRotatorFader.vue';
     left:50%;
     height: 0;
     width:var(--line-width);
+    opacity: var(--line-opacity);
     background: white;  
     transform: translateX(-50%);
     

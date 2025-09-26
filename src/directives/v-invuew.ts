@@ -11,7 +11,7 @@ type Opts = {
 
 const DEFAULTS: Opts = {
   root: null,
-  rootMargin: '0px 0px -10% 0px',
+  rootMargin: '0px 0px -20% 0px',
   threshold: 0.15,
   once: true,
   className: 'in-view',

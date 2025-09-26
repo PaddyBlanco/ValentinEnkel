@@ -26,7 +26,7 @@
         loading: "lazy",
     });
 
-    const widths = [480, 768, 1024, 1280, 1600, 2000];
+    const widths = [480, 768, 1024, 1280, 1680, 1920];
 
     const base = import.meta.env.BASE_URL; // => '/ValentinEnkel/'
 
