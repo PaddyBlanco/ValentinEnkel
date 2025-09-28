@@ -1,10 +1,11 @@
 a{
-    color: var(--color-highlight);
+    color: var(--color);
     text-decoration: none;
 }
 
 a:hover{
-    text-decoration: underline;
+    text-decoration: none;
+    color: var(--color-hover)
 }
 
 

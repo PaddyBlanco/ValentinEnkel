@@ -4,15 +4,11 @@
       <img src="/src/assets/Svgs/Logo/Schriftzug_Bauer.svg" alt="Bauer Logo" />
     </a>
 
-    <button
-      class="nav-toggle"
-      :aria-expanded="showNav"
-      aria-controls="primary-nav"
-      @click="toggleNav"
-      @keydown.escape="closeNav"
-      type="button">
+    <!-- Toggle Button -->
+    <button class="nav-toggle" :aria-expanded="showNav" aria-controls="primary-nav" @click="toggleNav"
+      @keydown.escape="closeNav" type="button">
       <span class="sr-only">Menü {{ showNav ? 'schließen' : 'öffnen' }}</span>
-      <svg :class="['nav-icon', { 'is-open': showNav }]" viewBox="0 0 80 40"  aria-hidden="true" focusable="false">
+      <svg :class="['nav-icon', { 'is-open': showNav }]" viewBox="0 0 80 40" aria-hidden="true" focusable="false">
         <g class="bar bar--top">
           <line class="line" x1="5" y1="10" x2="75" y2="10" />
         </g>
@@ -22,22 +18,25 @@
       </svg>
     </button>
 
-    <div
-      class="backdrop"
-      :class="{ 'is-open': showNav }"
-      @click="closeNav"
-      aria-hidden="true"
-    ></div>
+    <!-- backdrop -->
+    <div class="backdrop" :class="{ 'is-open': showNav }" @click="closeNav" aria-hidden="true"></div>
 
-    <!-- Hauptnavigation: semantisch korrektes <nav>, bleibt immer im DOM (SEO) -->
-    <nav id="primary-nav" class="navigation" :class="{ 'is-open': showNav }"
-      aria-label="Hauptnavigation" :aria-hidden="!showNav">
+    <!-- Navigation -->
+    <nav id="primary-nav" class="navigation" :class="{ 'is-open': showNav }" aria-label="Hauptnavigation"
+      :aria-hidden="!showNav">
       <div class="nav-list" role="list">
-        <div><a ref="firstLink" href="/about">Home</a><span>Base</span></div>
+        <div><a ref="firstLink" href="/about">Home</a><span>base</span></div>
         <div><a href="/projects">Services</a><span>was wir anbieten</span></div>
         <div><a href="/contact">Über uns</a><span>wer wir sind</span></div>
         <div><a href="/contact">Kontakt</a><span>auf augenhöhe</span></div>
       </div>
+      <div class="flex-row w-100 nav-footer">
+        <div class="nav-footer-item"><a href="/inprint">Impressum</a></div>
+        <div class="nav-footer-item"><a href="/privacyPolicy">Datenschutz</a></div>
+        <div class="nav-footer-item"><a href="/agbs">AGBs</a></div>
+        <div class="flex-item text-right"><a href="/agbs">LinkedIn</a></div>
+      </div>
+      <div class="line-1"></div>
     </nav>
   </header>
 </template>
@@ -53,7 +52,7 @@ const openNav = async () => {
   showNav.value = true
   // Scroll sperren (body scroll lock)
   //document.documentElement.style.overflow = 'hidden'
-     //document.body.style.overflow = 'hidden'
+  //document.body.style.overflow = 'hidden'
   await nextTick()
   firstLink.value?.focus()
 }
@@ -92,22 +91,57 @@ watch(
 
 <style scoped>
 
-.nav-list{
-  width: 100%;
-  margin-block-end: 10rem;
+/* Panel: animiert per transform (performant), nicht via width */
+.navigation {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: end;
+  top: 0;
+  right: 0;
+  height: 100svh;
+  width: 50vw;
+  min-width: 1000px;
+  padding-block-start: 10rem;
+  background-color: var(--background-color);
+  transform: translateX(100%);
+  transition: transform 260ms ease;
+  z-index: 100;
+  border-left: 1px solid var(--line-color);
 }
 
-.nav-list div{
-  flex: 0 0 100%;   
+
+/* Navigation  */
+.nav-list {
+  width: 100%;
+}
+
+.nav-list div {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 100%;
   padding-inline-start: 20%;
   border-bottom: 1px solid #ffffff55;
 }
 
-.nav-list div a{
+.nav-list span {
+  margin-block-start: 30px;
+  font-family: 'Courier New';
+  margin-inline-start: 20px;
+  display: none;
+}
+
+.nav-list div:hover span {
+  display: block;
+}
+
+
+.nav-list div a {
   font-size: 120px;
   font-family: 'Cal Sans';
-    margin: 0;
-    font-weight: normal;
+  margin: 0;
+  font-weight: normal;
 }
 
 
@@ -157,34 +191,9 @@ watch(
   pointer-events: auto;
 }
 
-/* Panel: animiert per transform (performant), nicht via width */
-.navigation {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: end;
-  top: 0;
-  right: 0;
-  height: 100svh;
-  width: 50vw;
-  min-width: 1000px;
-  max-width: 100%;
-  padding-block-start:10rem;
-  background-color: var(--background-color, #111);
-  transform: translateX(100%);
-  transition: transform 260ms ease;
-  z-index: 100;
-}
-
 .navigation.is-open {
   transform: translateX(0);
 }
-
-
-
-
-
 
 .nav-icon {
   color: #fff;
@@ -206,20 +215,22 @@ watch(
 }
 
 /* Ausgangslage: auseinandergezogen */
-.bar--top { transform: translateY(0) rotate(0); }
-.bar--bottom { transform: translateY(0) rotate(0); }
-
-/* Offen -> X */
-.nav-icon.is-open .bar--top { transform: translateY(10px) rotate(22.5deg); }
-.nav-icon.is-open .bar--bottom { transform: translateY(-10px) rotate(-22.5deg); }
-
-/* Reduced motion respektieren */
-@media (prefers-reduced-motion: reduce) {
-  .backdrop,
-  .navigation,
-  .bar { transition: none; }
+.bar--top {
+  transform: translateY(0) rotate(0);
 }
 
+.bar--bottom {
+  transform: translateY(0) rotate(0);
+}
+
+/* Offen -> X */
+.nav-icon.is-open .bar--top {
+  transform: translateY(10px) rotate(22.5deg);
+}
+
+.nav-icon.is-open .bar--bottom {
+  transform: translateY(-10px) rotate(-22.5deg);
+}
 
 /* Screenreader only */
 .sr-only {
@@ -234,27 +245,62 @@ watch(
   border: 0;
 }
 
+.nav-footer {
+  padding-inline-start: 20%;
+  padding-inline-end: 75px;
+  padding-block: 5rem;
+}
+
+.nav-footer-item {
+  padding-inline-end: 3rem;
+}
+
+.line-1 {
+    position: absolute;
+    top: 0;
+    left: 10%;
+    height: 100%;
+    width: var(--line-width);
+    background:var(--line-color);
+  }
+
+
+/* Reduced motion respektieren */
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .navigation,
+  .bar {
+    transition: none;
+  }
+}
+
 
 @media (max-width: 1000px) {
-   .logo {
+  .navigation {
+    width: 100vw;
+    min-width: 100%;
+  }
+  .nav-list div a {
+  font-size: 70px;
+}
+
+  .logo {
     top: 20px;
     left: 20px;
-   }
+  }
 
-   .logo img{
-      height: 25px;
-   }
+  .logo img {
+    height: 25px;
+  }
 
-.nav-icon{
-      width: 60px;
-      height: 30px;
+  .nav-icon {
+    width: 60px;
+    height: 30px;
+  }
+
+  .nav-toggle {
+    top: 20px;
+    right: 20px;
+  }
 }
-
-.nav-toggle{
-      top: 20px;
-      right: 20px;
-}
-   
-}
-
 </style>

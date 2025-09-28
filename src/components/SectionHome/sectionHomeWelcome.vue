@@ -19,9 +19,9 @@
 </template> 
 
 <script setup lang="ts">
-import CompAnimatedGradient from './compAnimatedGradient.vue';
+import CompAnimatedGradient from '../Core/compAnimatedGradient.vue';
 // import TextRotator from './TextRotator.vue';
-import TextRotatorFader from './TextRotatorFader.vue';
+import TextRotatorFader from '../Core/TextRotatorFader.vue';
 
 </script>
 
@@ -33,8 +33,7 @@ import TextRotatorFader from './TextRotatorFader.vue';
     left:50%;
     height: 0;
     width:var(--line-width);
-    opacity: var(--line-opacity);
-    background: white;  
+    background: var(--line-color);  
     transform: translateX(-50%);
     
     animation: drawLine 1s ease-out forwards;
@@ -52,6 +51,7 @@ import TextRotatorFader from './TextRotatorFader.vue';
 
 .line-text{
     position:absolute;
+    color:var(--line-color);
     top: 77vh;
     left: calc(50% + 15px);
     color: white;
@@ -60,6 +60,7 @@ import TextRotatorFader from './TextRotatorFader.vue';
     animation: fadeIn 1s ease-out forwards;
     animation-delay: 1s;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;                /* Start mit 0 Höhe */

@@ -114,11 +114,11 @@ onBeforeUnmount(() => {
 .line-1 {
   position: absolute;
   top: 0;
+  z-index: 10;
   left: 50%;
   height: 0;
   width: var(--line-width);
-  opacity: var(--line-opacity);
-  background: var(--color);
+  background: var(--line-color);
   transform: translateX(-50%);
   animation: drawLine 1.5s ease-out forwards;
   animation-delay: 2s;
@@ -126,12 +126,11 @@ onBeforeUnmount(() => {
 
 .line-w {
   position: absolute;
-  z-index: 100;
+  z-index: 10;
   bottom: 0;
   left: 50%;
   height: var(--line-width);
-  opacity: var(--line-opacity);
-  background-color: var(--color);
+  background-color: var(--line-color);
 
   width: 20px;
 }
