@@ -111,7 +111,7 @@ watch(
   position: relative;
   display: inline-block;
   width: 100%;
-  height: 120px;      /* fixe Höhe verhindert Layout-Shift; anpassen falls nötig */
+  height: var(--h1-size);      /* fixe Höhe verhindert Layout-Shift; anpassen falls nötig */
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

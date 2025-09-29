@@ -11,7 +11,7 @@ section{
 
 .monospace{
   font-family: 'Courier New', monospace;
-  font-size: 15pt;
+  font-size: var(--monospace-size);
 }
 
 
@@ -22,15 +22,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: 120px;
+    font-size: var(--h1-size);
 }
 
 h2{
-    font-size: 85px;
+    font-size: var(--h2-size);
 }
 
 h3 {
-    font-size: 63px; 
+    font-size: var(--h3-size); 
 }
 
 
@@ -92,15 +92,7 @@ img{
 
 
 @media(max-width: 1000px){
-    h1{
-        font-size: 70px;
-    }
-    h2{
-        font-size: 50px;
-    }
-    h3{
-        font-size: 40px;
-    }
+   
     section{
         padding-inline: 20px;
     }

@@ -8,13 +8,15 @@
         Mitarbeiterinnen und Mitarbeitern vor Ort.</p>
       <button v-inview class="btn reveal up">Services</button>
     </div>
-
-    <ResponsiveImage name="services/Services-1" alt="Webentwicklung-Service bei Valentin & Enkel"
-      className="s-image-1 reveal left" v-inview sizes="10vw" />
+<div class="images-container">
+   <ResponsiveImage name="services/Services-1" alt="Webentwicklung-Service bei Valentin & Enkel"
+      className="s-image-1 reveal left" v-inview sizes="9vw" />
     <ResponsiveImage name="services/Services-2" alt="Webentwicklung-Service bei Valentin & Enkel"
-      className="s-image-2 reveal left" v-inview sizes="10vw" />
+      className="s-image-2 reveal left" v-inview sizes="12vw" />
     <ResponsiveImage name="services/Services-3" alt="Webentwicklung-Service bei Valentin & Enkel"
       className="s-image-3 reveal left" v-inview sizes="10vw" />
+</div>
+ 
 
     <div class="line-1"></div>
     <div class="monospace mono-right">Technologieberatung von innen heraus</div>
@@ -195,5 +197,53 @@ onBeforeUnmount(() => {
     width: 100%;
     /* Von 30% bis 100% = 70% Länge */
   }
+}
+@media (max-width:1000px){
+  .section-services {
+  position: relative;
+  padding-block: 3rem;
+  padding-inline:0;
+}
+ .section-services h1 {
+  
+  padding-inline-start:20px;
+}
+  .line-1{
+    left:30%;
+  }
+  .images-container{
+    position: relative;
+    width: 100%;
+    height: 40vh;
+  }
+  .text-container {
+  width: 100%;
+  max-width: none;
+  padding-left: 15%;
+  margin-left: 0;
+}
+.s-image-1 {
+  right: 0;
+  top: 2rem;
+  width: 60%;
+}
+
+
+.s-image-2 {
+  position: absolute;
+  right: unset;
+  left:0;
+  top: 5rem;
+  width: calc(30vw);
+}
+
+.s-image-3 {
+  position: absolute;
+  left: 40%;
+  bottom: 0;
+  width: 40%;
+}
+
+
 }
 </style>

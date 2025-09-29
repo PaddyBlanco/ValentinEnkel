@@ -51,8 +51,8 @@ const openNav = async () => {
   if (showNav.value) return
   showNav.value = true
   // Scroll sperren (body scroll lock)
-  //document.documentElement.style.overflow = 'hidden'
-  //document.body.style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
   await nextTick()
   firstLink.value?.focus()
 }
@@ -100,10 +100,9 @@ watch(
   justify-content: end;
   top: 0;
   right: 0;
-  height: 100svh;
-  width: 50vw;
+  height: 100dvh;
+  width: 50dvw;
   min-width: 1000px;
-  padding-block-start: 10rem;
   background-color: var(--background-color);
   transform: translateX(100%);
   transition: transform 260ms ease;
@@ -138,7 +137,7 @@ watch(
 
 
 .nav-list div a {
-  font-size: 120px;
+  font-size: 10vh;
   font-family: 'Cal Sans';
   margin: 0;
   font-weight: normal;
@@ -179,7 +178,7 @@ watch(
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.0);
+  background: rgba(0, 0, 0, 0.2);
   opacity: 0;
   pointer-events: none;
   transition: opacity 200ms ease, background 200ms ease;
@@ -279,9 +278,10 @@ watch(
   .navigation {
     width: 100vw;
     min-width: 100%;
+    border-left:none;
   }
   .nav-list div a {
-  font-size: 70px;
+  font-size:  var(--h1-size);
 }
 
   .logo {
@@ -302,5 +302,20 @@ watch(
     top: 20px;
     right: 20px;
   }
+  .nav-list div {
+ 
+  padding-inline-start: 10%;
+ 
+}
+.nav-footer{
+  gap:1rem;
+}
+.nav-footer-item{
+  width:50%;
+}
+
+.line-1{
+  left:5%;
+}
 }
 </style>

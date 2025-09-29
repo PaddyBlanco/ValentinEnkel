@@ -52,7 +52,7 @@ import TextRotatorFader from '../Core/TextRotatorFader.vue';
 .line-text{
     position:absolute;
     color:var(--line-color);
-    top: 77vh;
+    top: 78vh;
     left: calc(50% + 15px);
     color: white;
     transform:translateX(-50%) rotate(90deg);
@@ -93,11 +93,18 @@ import TextRotatorFader from '../Core/TextRotatorFader.vue';
     color: white;
     z-index: 1;
 }
-@media(max-width: 768px){
+@media(max-width: 1000px){
     .welcome-text{
         top: 40%;
-        left: 10%;
+        left: 30%;
         width:90%;
+    }
+    .line{
+      left:30%;
+    }
+
+    .line-text{
+        left: calc(30% + 15px);
     }
 }
  
