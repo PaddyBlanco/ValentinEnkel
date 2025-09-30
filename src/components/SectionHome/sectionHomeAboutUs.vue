@@ -39,17 +39,17 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
 
 
 <style scoped>
-.line-1 {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    height: 0;
-    width: var(--line-width);
-    background:var(--line-color);
-    transform: translateX(-50%);
-    animation: drawLine 1.5s ease-out forwards;
-    animation-delay: 2s;
-}
+    .line-1 {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        height: 0;
+        width: var(--line-width);
+        background:var(--line-color);
+        transform: translateX(-50%);
+        animation: drawLine 1.5s ease-out forwards;
+        animation-delay: 2s;
+    }
 
 
 

@@ -11,10 +11,6 @@ import SectionHomeAboutUs from '../components/SectionHome/sectionHomeAboutUs.vue
 import SectionHomeApproach from '../components/SectionHome/sectionHomeApproach.vue';
 import SectionHomeServices from '../components/SectionHome/sectionHomeServices.vue';
 import SectionHomeWelcome from '../components/SectionHome/sectionHomeWelcome.vue';
-
-
-
-
 </script>
 
 <style scoped>

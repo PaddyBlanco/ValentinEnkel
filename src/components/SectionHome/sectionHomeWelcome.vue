@@ -23,6 +23,10 @@ import CompAnimatedGradient from '../Core/compAnimatedGradient.vue';
 // import TextRotator from './TextRotator.vue';
 import TextRotatorFader from '../Core/TextRotatorFader.vue';
 
+
+
+
+
 </script>
 
 <style scoped>
