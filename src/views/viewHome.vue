@@ -1,7 +1,7 @@
 <template>
 
- <SectionHomeWelcome></SectionHomeWelcome>
-<SectionHomeServices></SectionHomeServices>
+ <SectionHomeWelcome></SectionHomeWelcome> 
+ <SectionHomeServices></SectionHomeServices>
 <SectionHomeAboutUs></SectionHomeAboutUs>
 <SectionHomeApproach></SectionHomeApproach>
 </template>

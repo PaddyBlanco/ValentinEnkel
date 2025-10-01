@@ -49,8 +49,8 @@
 
 @media (max-width: 1700px) {
     :root {
-    --font-size: 17px;
-    --monospace-size: 13px;
+        --font-size: 17px;
+        --monospace-size: 13px;
 
         --h1-size: 100px;
         --h2-size: 70px;
@@ -63,10 +63,9 @@
     :root {
         --line-width: 1px;
         --line-opacity: 0.4;
-    --font-size: 15px;
-    --monospace-size: 11px;
-
-        --h1-size: 70px;
+        --font-size: 15px;
+        --monospace-size: 11px;
+        --h1-size: 65px;
         --h2-size: 50px;
         --h3-size: 40px;
     }
@@ -75,22 +74,36 @@
 * {
     box-sizing: border-box;
     transition: transform 0.2s ease;
-    text-wrap: break-word;
+}
+:root, html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip; /* besser als hidden wegen Sticky/Scroll-Snap */
 }
 
-html {
-    scroll-behavior: smooth;
-    overflow-x: hidden;
+html { 
+  scroll-behavior: smooth;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+   scrollbar-width: none; /* Versteckt die Scrollbar in Firefox */
+  -ms-overflow-style: none; /* Versteckt die Scrollbar in Internet Explorer 10+ */
+  color-scheme: light dark;
+    max-width: 100%;
 }
 
-body {
+body {  
+    margin: 0 ;
     background-color: var(--background-color);
     color: var(--color);
     font-family: var(--font-family);
     font-size: var(--font-size);
     font-weight: 100;
-    margin: 0;
-    padding: 0;
+    text-rendering: optimizeLegibility;
+}
+main, #app {
+  min-height: 100%;
 }
 
 p {

@@ -215,6 +215,7 @@ onBeforeUnmount(() => {
     position: relative;
     width: 100%;
     height: 40vh;
+    margin-block:3rem;
   }
   .text-container {
   width: 100%;

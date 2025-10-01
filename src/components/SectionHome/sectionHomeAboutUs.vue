@@ -79,13 +79,40 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
 
 
 .text-container {
-    margin-inline-start: 10rem;
+    margin-inline-start: 10vw;
     margin-bottom: 5px;
 
 }
 
 .text-container .text {
-    max-width: 400px;
-    margin-inline-start: 10rem;
+    max-width: 25vw;
+    margin-inline-start: 10vw;
+}
+
+@media(max-width: 1000px) {
+  .image-aboutus {
+    width: 90vw;
+    height: 90vw;
+}
+.line-1{
+    left:30vw;
+}
+.flex-row {
+    flex-direction: column;
+    align-items: center;
+}
+
+.text-container {
+    margin-inline-start: 0;
+    margin-top: 3rem;
+}
+.text-container .text {
+    max-width: 90vw;
+    margin-inline-start: 0;
+
+}
+.section-aboutus {
+    padding-block: 5rem;
+}
 }
 </style>
