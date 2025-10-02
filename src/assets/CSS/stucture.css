@@ -23,18 +23,24 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
     font-size: var(--h1-size);
+    line-height: calc(var(--h1-size)*1.1);
 }
 
 h2{
     font-size: var(--h2-size);
+    line-height: calc(var(--h2-size)*1.1);
+
 }
 
 h3 {
     font-size: var(--h3-size); 
+    line-height: calc(var(--h3-size)*1.1);
+
 }
 
 
 img{
+    position: relative;
     max-width: 100%;
     height: auto;
 }
@@ -72,6 +78,19 @@ img{
 .felx-item-2{
     flex: 2;
 }
+.w-100{
+    width: 100%;
+}
+.w-50{
+    width: 50%;
+}
+.w-33{
+    width:33%;
+}
+.w-66{
+    width: 66%;
+}
+
 .flex-center{
     justify-content: center;
     align-items: center;
@@ -89,10 +108,17 @@ img{
     text-align: left;
 }
 
-
+.only-mobile{
+    display: none;
+}
 
 @media(max-width: 1000px){
-   
+   .no-mobile{
+    display: none;
+}
+.only-mobile{
+    display: inline-block;
+}
     section{
         padding-inline: 20px;
     }

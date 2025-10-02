@@ -79,14 +79,14 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
 
 
 .text-container {
-    margin-inline-start: 10vw;
+    margin-inline-start: 7vw;
     margin-bottom: 5px;
 
 }
 
 .text-container .text {
     max-width: 25vw;
-    margin-inline-start: 10vw;
+    margin-inline-start: 7vw;
 }
 
 @media(max-width: 1000px) {

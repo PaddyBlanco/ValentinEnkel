@@ -20,7 +20,7 @@ async function processImage(filePath: string) {
       jobs.push(
         sharp(filePath)
           .resize(size)
-          .toFormat(format as any, { quality: 80 })
+          .toFormat(format as any, { quality: 90 })
           .toFile(outputPath)
           .then(() => console.log(`✔️ ${outputPath}`))
       );
@@ -31,7 +31,7 @@ async function processImage(filePath: string) {
   const originalWebpPath = path.join(dir, `${name}-original.webp`);
   jobs.push(
     sharp(filePath)
-      .toFormat("webp", { quality: 85 }) // etwas höher für Original
+      .toFormat("webp", { quality: 90 }) // etwas höher für Original
       .toFile(originalWebpPath)
       .then(() => console.log(`✔️ ${originalWebpPath}`))
   );

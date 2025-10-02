@@ -111,14 +111,13 @@ watch(
   position: relative;
   display: inline-block;
   width: 100%;
-  height: var(--h1-size);      /* fixe Höhe verhindert Layout-Shift; anpassen falls nötig */
-  overflow: hidden;
+  max-height: var(--h2-size);
+  height: var(--h2-size);
+  overflow: show;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-@media (max-width: 1000px) {
-  .rotator { height: 70px; }
-}
+
 
 .word {
   position: absolute;
@@ -147,5 +146,8 @@ watch(
     transition: none !important;
     opacity: 1 !important;
   }
+}
+@media (max-width: 1000px) {
+  .rotator { height: 70px; }
 }
 </style>

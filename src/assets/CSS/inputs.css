@@ -1,6 +1,7 @@
 a{
     color: var(--color);
     text-decoration: none;
+    
 }
 
 a:hover{
@@ -20,6 +21,7 @@ button{
 }
 
 .btn{
+    display: inline-block;
     border-radius: 40px;
     text-decoration: uppercase;
     color: var(--color);

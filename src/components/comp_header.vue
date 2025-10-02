@@ -1,7 +1,7 @@
 <template>
   <header class="site-header" role="banner">
     <a class="logo" href="/" rel="home" aria-label="Startseite: Bauer">
-      <img src="/src/assets/Svgs/Logo/Schriftzug_Bauer.svg" alt="Bauer Logo" />
+      <img src="/src/assets/Svgs/Logo/Schriftzug-Bauer.svg" alt="Valentin & enkel Logo mit Bauer" />
     </a>
 
     <!-- Toggle Button -->
@@ -102,7 +102,7 @@ watch(
   right: 0;
   height: 100dvh;
   width: 50dvw;
-  min-width: 1000px;
+  min-width: 750px;
   background-color: var(--background-color);
   transform: translateX(100%);
   transition: transform 260ms ease;
@@ -151,7 +151,7 @@ watch(
 
 .logo {
   position: fixed;
-  top: 70px;
+  top: 50px;
   left: 75px;
   z-index: 10;
   background: none;
@@ -165,7 +165,7 @@ watch(
 .nav-toggle {
   position: fixed;
   right: 75px;
-  top: 70px;
+  top: 50px;
   background: none;
   border: none;
   padding: 0;
