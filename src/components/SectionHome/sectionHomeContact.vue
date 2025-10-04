@@ -8,9 +8,8 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
     <section>
         <div class="section-aboutus flex-row">
             <div class="image-container text-right flex-bottom">
-                <div class="only-mobile">
+                <div class="only-mobile w-66">
                     <h1 class="mbe-1 w-100 text-left">Ihr Weg <br> zu uns.</h1>
-
                 </div>
 
                 <ResponsiveImage name="contact/Contact" alt="Webentwicklung-Service bei Valentin & Enkel"

@@ -1,7 +1,7 @@
 <template>
   <header class="site-header" role="banner">
-    <a class="logo" href="/" rel="home" aria-label="Startseite: Bauer">
-      <img src="/src/assets/Svgs/Logo/Schriftzug-Bauer.svg" alt="Valentin & enkel Logo mit Bauer" />
+    <a class="logo" href="/">
+      <img fetchpriority=high  src="/Logo/Schriftzug-Bauer.svg" alt="Valentin & enkel Logo mit Bauer" />
     </a>
 
     <!-- Toggle Button -->
@@ -25,10 +25,10 @@
     <nav id="primary-nav" class="navigation" :class="{ 'is-open': showNav }" aria-label="Hauptnavigation"
       :aria-hidden="!showNav">
       <div class="nav-list" role="list">
-        <div><a ref="firstLink" href="/about">Home</a><span>base</span></div>
-        <div><a href="/projects">Services</a><span>was wir anbieten</span></div>
-        <div><a href="/contact">Über uns</a><span>wer wir sind</span></div>
-        <div><a href="/contact">Kontakt</a><span>auf augenhöhe</span></div>
+        <div><router-link ref="firstLink" to="/">Home</router-link><span>base</span></div>
+        <div><router-link to="/Services">Services</router-link><span>was wir anbieten</span></div>
+        <div><router-link to="/AboutUs">Über uns</router-link><span>wer wir sind</span></div>
+        <div><router-link to="/Contact">Kontakt</router-link><span>auf augenhöhe</span></div>
       </div>
       <div class="flex-row w-100 nav-footer">
         <div class="nav-footer-item"><a href="/inprint">Impressum</a></div>

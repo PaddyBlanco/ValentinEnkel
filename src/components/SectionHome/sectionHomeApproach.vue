@@ -6,11 +6,17 @@
       <div class="line-h"></div>
     </div>
     <div class="overlay-gradient-top"></div>
+    <!-- <div class="overlay-navigation dots">
+      <a  v-for="s in steps" :key="s.nr" :href="'#'+s.nr" :ref="s.nr" :class="true?'inview':''">
+      <div class="dot">
+      </div>
+    </a>
+    </div> -->
     <div class="overlay-gradient-bottom"></div>
-    <div class="overlay-bottom text-right">
+    <div class="overlay-bottom flex-row">
+     <div class="flex-item text-right mbs-1 mie-1"><router-link to="/Services" class="btn overlay-button">Services</router-link></div> 
       <div class="line-h"></div>
-
-        <div  v-inview class="monospace mie-2 mbs-1 reveal top">Für Lösungen, die wirken</div>
+      <div class="monospace mie-2 mbs-1 flex-item text-right">Für Lösungen, die wirken</div>
     </div>
 
 
@@ -20,7 +26,7 @@
           <div class="flex-row">
             <div class="text-nr">{{ step.nr }}</div>
             <div class="flex-item flex-center text-title">
-              <h3> {{ step.title }}</h3>
+              <h2> {{ step.title }}</h2>
             </div>
           </div>
           <div class="step-image-container-mobile">
@@ -36,9 +42,7 @@
             className="step-image" sizes="40vw" />
         </div>
       </div>
-
     </div>
-
   </section>
 </template>
 <script setup lang="ts">
@@ -51,10 +55,10 @@ const steps = [
     title: "Erstgespräch & Kennenlernen",
     image: "/images/approach/approach-step1.jpg",
     imageAlt: "Erstgespräch mit Geschäftsführung",
-    description: `In einem unverbindlichen Gespräch lernen Sie uns, unsere Arbeitsweise
-und unser Leistungsspektrum kennen. Gleichzeitig möchten wir Ihr Unternehmen und Ihre
-Herausforderungen verstehen – offen und auf Augenhöhe. Mit einer NDA schaffen wir
-die Basis für eine vertrauensvolle Zusammenarbeit.`
+    description: `In einem unverbindlichen Gespräch lernen wir Ihr Unternehmen
+und Ihre Ausgangssituation kennen. Offen, auf Augenhöhe und mit
+Geheimhaltungsvereinbarung schaffen wir die Basis für eine
+vertrauensvolle Zusammenarbeit.`
   },
   {
     nr: "2",
@@ -145,6 +149,10 @@ wir bleiben Ihr zentraler Ansprechpartner und begleiten Sie bis zum Ergebnis.`
   max-width: 500px;
   justify-items: start;
 }
+.text-title h2{
+    font-size: var(--h3-size); 
+    line-height: calc(var(--h3-size)*1.1);
+}
 
 
 .section-approach {
@@ -168,10 +176,33 @@ wir bleiben Ihr zentraler Ansprechpartner und begleiten Sie bis zum Ergebnis.`
 
 .overlay-gradient-top {
   position: sticky;
-  top: 25dvh;
-  height: 15dvh;
+  top: 25vh;
+  height: 15vh;
   background: linear-gradient(180deg, var(--background-color) 0%, transparent 100%);
 }
+
+/* .overlay-navigation{
+  position: sticky;
+  z-index: 2;
+  top: 25vh;
+  left: 95%;
+  height: 15vh;
+  width:5%;
+}
+.dots{
+  display: flex;
+  gap: 3dvh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.dot{
+  height: 10px;
+  width: 10px;
+  background-color: var(--color);
+  border-radius: 5px;
+  border: 1px solid red;
+} */
 
 
 .overlay-gradient-bottom {
@@ -179,8 +210,8 @@ wir bleiben Ihr zentraler Ansprechpartner und begleiten Sie bis zum Ergebnis.`
   top: 75dvh;
   height: 15dvh;
   background: linear-gradient(0deg, var(--background-color) 50%, transparent 100%);
-
 }
+
 
 .overlay-bottom {
   position: sticky;

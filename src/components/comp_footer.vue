@@ -8,7 +8,7 @@ import ResponsiveImage from './Core/ResponsiveImage.vue';
     className="footer-gradient" sizes="100vw" />
     <footer class="footer">
             <div class="footer-column logo-container">
-                <img src="/src/assets/Svgs/Logo/Schriftzug-Bauer-v3.svg" alt="Valentin & enkel Logo mit Bauer" />
+                <img  fetchpriority="high" src="/Logo/Schriftzug-Bauer-V3.svg" alt="Valentin & enkel Logo mit Bauer" />
             </div>
 
             <div class="footer-column footer-text no-mobile">
@@ -19,7 +19,7 @@ import ResponsiveImage from './Core/ResponsiveImage.vue';
             </div>
             <div class="footer-column"> Linzerberg 5,<br>
                 4209 Engerwitzdorf <br> <br>
-                <a href="mailto: office@valentin-enkel.com">office@valentin-enkel.com</a> <br>
+                <a href="mailto: office@valentin-enkel.com">office@valentin-enkel.com</a> <br><br>
                 <a href="tel: +436644150837"> +43 664 41 50 837</a>
             </div>
             <nav class="footer-column">
@@ -51,6 +51,7 @@ import ResponsiveImage from './Core/ResponsiveImage.vue';
     padding-inline-start: 5rem;
     word-wrap: break-word;
 }
+
 .footer-text{
     padding-inline: 0 3rem;
 }

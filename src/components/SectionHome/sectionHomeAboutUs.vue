@@ -8,48 +8,43 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
     <section>
         <div class="section-aboutus flex-row">
             <div class="flex-item text-right flex-bottom">
-                    <ResponsiveImage name="aboutus/AboutUs-1" alt="Webentwicklung-Service bei Valentin & Enkel"
-                        className="image-aboutus reveal right" v-inview sizes="100vw" />
+                <ResponsiveImage name="aboutus/AboutUs-1" alt="Webentwicklung-Service bei Valentin & Enkel"
+                    className="image-aboutus reveal right" v-inview sizes="100vw" />
             </div>
+            
             <div class="flex-item flex-bottom">
                 <div v-inview class="reveal right text-container">
                     <h1 class="mbe-1">Über uns.</h1>
                     <div class="text">
-                        <p>Lorem ipsum dolor sit amet, consectetuer
-                            adipiscing elit, sed diam nonummy nibh euismod
-                            tincidunt ut laoreet dolore magna aliquam erat
-                            volutpat. Ut wisi enim ad minim veniam, quis
-                            nostrud exerci tation ullamcorper suscipit
-                            lobortis nisl ut aliquip ex ea commodo
-                            consequat.
+                        <p>Valentin & Enkel ist eine Hommage an unseren
+                            Großvater, der Innovationsgeist, technisches
+                            Verständnis und Menschlichkeit vereinte. Heute
+                            führen wir diese Haltung fort – als Brücke
+                            zwischen Herkunft und Zukunft, traditionellen
+                            Werten und modernem Unternehmertum.
                         </p>
-                        <button class="btn mbs-2">Mehr</button>
-
+                        <RouterLink to="/AboutUs" class="btn mbs-2">Mehr</RouterLink>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
         <div class="line-1"></div>
-
     </section>
 </template>
 
 
 <style scoped>
-    .line-1 {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        height: 0;
-        width: var(--line-width);
-        background:var(--line-color);
-        transform: translateX(-50%);
-        animation: drawLine 1.5s ease-out forwards;
-        animation-delay: 2s;
-    }
+.line-1 {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 0;
+    width: var(--line-width);
+    background: var(--line-color);
+    transform: translateX(-50%);
+    animation: drawLine 1.5s ease-out forwards;
+    animation-delay: 2s;
+}
 
 
 
@@ -90,29 +85,33 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
 }
 
 @media(max-width: 1000px) {
-  .image-aboutus {
-    width: 90vw;
-    height: 90vw;
-}
-.line-1{
-    left:30vw;
-}
-.flex-row {
-    flex-direction: column;
-    align-items: center;
-}
+    .image-aboutus {
+        width: 90vw;
+        height: 90vw;
+    }
 
-.text-container {
-    margin-inline-start: 0;
-    margin-top: 3rem;
-}
-.text-container .text {
-    max-width: 90vw;
-    margin-inline-start: 0;
+    .line-1 {
+        left: 30vw;
+    }
 
-}
-.section-aboutus {
-    padding-block: 5rem;
-}
+    .flex-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .text-container {
+        margin-inline-start: 0;
+        margin-top: 3rem;
+    }
+
+    .text-container .text {
+        max-width: 90vw;
+        margin-inline-start: 0;
+
+    }
+
+    .section-aboutus {
+        padding-block: 5rem;
+    }
 }
 </style>

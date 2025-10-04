@@ -11,7 +11,7 @@
             <h2>von innen heraus.</h2>
         </div>
         <div class="pawn">
-           <img src="/src/assets/Svgs/Logo/logo-pawn.svg" alt="Bauer" />
+           <img src="/Logo/logo-pawn.svg" alt="Bauer" />
         </div>
         <div class="line-text monospace">scroll</div>
         <div class="line"> </div>
