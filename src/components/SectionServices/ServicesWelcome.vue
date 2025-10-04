@@ -1,34 +1,47 @@
 <template>
   <section class="section-welcome-services">
-    <h1>Greifbarer Mehrwert<br/>von innen heraus.</h1>
+     <div class="text-right headline"><h1>Greifbarer Mehrwert</h1></div>
+     <div class="text-left flex-row headline">
+        <h1 class="headline">von innen heraus.</h1>
+        <ResponsiveImage name="aboutus/AboutUs-1" 
+            alt="Webentwicklung-Service bei Valentin & Enkel"
+            className="headline-image" sizes="4vw" /> 
+             <ResponsiveImage name="aboutus/AboutUs-1" 
+            alt="Webentwicklung-Service bei Valentin & Enkel"
+            className="headline-image" sizes="4vw" /> 
+             <ResponsiveImage name="aboutus/AboutUs-1" 
+            alt="Webentwicklung-Service bei Valentin & Enkel"
+            className="headline-image" sizes="4vw" />   
+    </div>
     <canvas ref="canvas" class="mesh-canvas" aria-hidden="true"></canvas>
   </section>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import ResponsiveImage from "../Core/ResponsiveImage.vue";
 
-/** ---------- Konfiguration (Look & Feel) ---------- */
+/** ---------- Look & Feel ---------- */
 const cfg = {
   bg: "#000000",
-  lineBase: "rgba(255,255,255,0.07)",   // dezentes Netz
-  linePeak: "rgba(255,255,255,0.95)",   // Wellen-Highlight
-  lineWidth: 1,                         // px (wird mit DPR multipliziert)
-  spacing: 64,                          // Abstand der Knoten (px)
-  wave: {
-    speed: 260,      // px/s – Ausbreitungsgeschwindigkeit
-    band: 42,        // „Bandbreite“ der Front (größer = weicher)
-    amplitude: 6,    // max. Knoten-Auslenkung (px)
-    period: 4.8,     // s – Zeit zwischen zwei Wellen
-    count: 3         // gleichzeitig „laufende“ Fronten (versetzt)
+  lineBase: "rgba(255,255,255,0.1)",
+  linePeak: "rgba(255,255,255,0.6)",  // nahe Weiß für Highlight
+  lineWidth: 1,
+  spacing: 32,
+  jitter: 30,
+  kNearest: 4,
+  maxDistFactor: 1.8,
+  wave: { speed: 170, band: 42, amplitude: 6, period: 8, count: 2 },
+  subtleDrift: 0.15,
+  cursor: {
+    sigma: 30,   // „Radius“ des Maus-Highlights (px, als Gauß σ)
+    boost: 0.5,   // extra Aufhellung (0..1) für im Cursorbereich
   },
-  subtleDrift: 0.15, // sehr leichter Grunddrift (px), 0 = aus
 };
 
-/** ---------- Setup ---------- */
 type Vec = { x: number; y: number };
-type Node = { x: number; y: number; bx: number; by: number }; // base + current
-type Edge = [number, number]; // Indizes in nodes
+type Node = { x: number; y: number; bx: number; by: number };
+type Edge = [number, number];
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 let ctx: CanvasRenderingContext2D | null = null;
@@ -39,100 +52,139 @@ let center: Vec = { x: 0, y: 0 };
 let dpr = Math.max(1, window.devicePixelRatio || 1);
 const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** ---------- Triangular/Hex-Mesh ohne Überschneidungen ---------- */
-function buildMesh(w: number, h: number) {
+/** Mauszustand */
+const mouse = { x: Infinity, y: Infinity, active: false };
+
+/** ---------- Unregelmäßiges, planres Netz ---------- */
+function buildMeshIrregular(w: number, h: number) {
   nodes = [];
   edges = [];
 
   const s = cfg.spacing;
-  const rowH = s * Math.sin(Math.PI / 3); // ≈ 0.866 * s
-  const cols = Math.ceil(w / s) + 3;      // +Buffer über den Rand
-  const rows = Math.ceil(h / rowH) + 3;
+  const cols = Math.ceil(w / s) + 2;
+  const rows = Math.ceil(h / s) + 2;
+  const offsetX = -s, offsetY = -s;
 
-  // Knoten erzeugen (alternierende Offsets → hex/triangulär)
   for (let r = 0; r < rows; r++) {
-    const y = r * rowH - rowH; // nach oben padden
-    const isOdd = r % 2 === 1;
     for (let c = 0; c < cols; c++) {
-      const x = (c + (isOdd ? 0.5 : 0)) * s - s; // nach links padden
+      const baseX = offsetX + c * s;
+      const baseY = offsetY + r * s;
+      const jx = (Math.random() * 2 - 1) * cfg.jitter;
+      const jy = (Math.random() * 2 - 1) * cfg.jitter;
+      const x = baseX + jx, y = baseY + jy;
       nodes.push({ x, y, bx: x, by: y });
     }
   }
 
-  // Hilfsfunktion: Index in nodes
-  const idx = (r: number, c: number) => r * cols + c;
+  const maxDist = s * cfg.maxDistFactor;
 
-  // Kanten setzen: rechts, unten-rechts, unten-links (keine Überschneidung)
-  for (let r = 0; r < rows; r++) {
-    const isOdd = r % 2 === 1;
-    for (let c = 0; c < cols; c++) {
-      const a = idx(r, c);
-      // rechts
-      if (c + 1 < cols) edges.push([a, idx(r, c + 1)]);
-      // unten rechts
-      if (r + 1 < rows) {
-        const cr = c + (isOdd ? 0 : 1);
-        if (cr >= 0 && cr < cols) edges.push([a, idx(r + 1, cr)]);
-      }
-      // unten links
-      if (r + 1 < rows) {
-        const cl = c + (isOdd ? -1 : 0);
-        if (cl >= 0 && cl < cols) edges.push([a, idx(r + 1, cl)]);
+  for (let i = 0; i < nodes.length; i++) {
+    const a = nodes[i];
+    const dists: { j: number; d: number }[] = [];
+    for (let j = 0; j < nodes.length; j++) {
+      if (i === j) continue;
+      const b = nodes[j];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d > 0 && d <= maxDist) dists.push({ j, d });
+    }
+    dists.sort((A, B) => A.d - B.d);
+
+    let added = 0;
+    for (const { j } of dists) {
+      if (added >= cfg.kNearest) break;
+      const e: Edge = i < j ? [i, j] : [j, i];
+      if (edgeExists(edges, e)) continue;
+      if (!intersectsAnyExistingEdge(e, edges)) {
+        edges.push(e);
+        added++;
       }
     }
   }
 }
+function edgeExists(list: Edge[], [u, v]: Edge) {
+  for (let k = 0; k < list.length; k++) {
+    const [a, b] = list[k];
+    if ((a === u && b === v) || (a === v && b === u)) return true;
+  }
+  return false;
+}
+function intersectsAnyExistingEdge(e: Edge, list: Edge[]) {
+  const [u, v] = e;
+  const A = nodes[u], B = nodes[v];
+  for (let k = 0; k < list.length; k++) {
+    const [m, n] = list[k];
+    if (u === m || u === n || v === m || v === n) continue;
+    const C = nodes[m], D = nodes[n];
+    if (segmentsIntersect(A, B, C, D)) return true;
+  }
+  return false;
+}
+function segmentsIntersect(a: Vec, b: Vec, c: Vec, d: Vec) {
+  const o1 = orient(a, b, c), o2 = orient(a, b, d);
+  const o3 = orient(c, d, a), o4 = orient(c, d, b);
+  if (o1 === 0 && onSegment(a, c, b)) return true;
+  if (o2 === 0 && onSegment(a, d, b)) return true;
+  if (o3 === 0 && onSegment(c, a, d)) return true;
+  if (o4 === 0 && onSegment(c, b, d)) return true;
+  return (o1 > 0 && o2 < 0 || o1 < 0 && o2 > 0) &&
+         (o3 > 0 && o4 < 0 || o3 < 0 && o4 > 0);
+}
+function orient(p: Vec, q: Vec, r: Vec) {
+  return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+}
+function onSegment(p: Vec, q: Vec, r: Vec) {
+  return Math.min(p.x, r.x) <= q.x && q.x <= Math.max(p.x, r.x) &&
+         Math.min(p.y, r.y) <= q.y && q.y <= Math.max(p.y, r.y);
+}
 
-/** ---------- Canvas-Größe & DPR ---------- */
+/** ---------- Canvas & DPR ---------- */
 function resize() {
   if (!canvas.value) return;
   const { clientWidth, clientHeight } = canvas.value;
   dpr = Math.max(1, window.devicePixelRatio || 1);
-  canvas.value.width = Math.floor(clientWidth * dpr);
+  canvas.value.width  = Math.floor(clientWidth * dpr);
   canvas.value.height = Math.floor(clientHeight * dpr);
   ctx = canvas.value.getContext("2d");
   if (!ctx) return;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // 1 CSS px = 1 Einheit
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   center = { x: clientWidth / 2, y: clientHeight / 2 };
-  buildMesh(clientWidth, clientHeight);
+  buildMeshIrregular(clientWidth, clientHeight);
 }
 
-/** ---------- Wellenfunktion (Mehrere versetzte Fronten) ---------- */
+/** ---------- Hüllkurven ---------- */
 function waveEnvelope(distance: number, t: number) {
   const { speed, band, period, count } = cfg.wave;
   let intensity = 0;
   for (let i = 0; i < count; i++) {
-    const phase = ((t + (i * period) / count) % period);
-    const R = speed * phase;                      // Front-Radius
-    const delta = distance - R;
-    // Gauß um die Front; 0.399 ~ 1/sqrt(2π) für ordentlichen Peak
-    const gauss = Math.exp(-(delta * delta) / (2 * band * band));
-    intensity += gauss;
+    const phase = (t + (i * period) / count) % period;
+    const R = speed * phase;
+    const d = distance - R;
+    intensity += Math.exp(-(d * d) / (2 * band * band));
   }
   return intensity; // 0..≈count
 }
+function cursorEnvelope(distance: number) {
+  if (!mouse.active) return 0;
+  const s = cfg.cursor.sigma;
+  return Math.exp(-(distance * distance) / (2 * s * s)); // 0..1
+}
 
-/** ---------- Animation-Loop ---------- */
-function animate(ts: number) {
+/** ---------- Render ---------- */
+function render(t: number) {
   if (!ctx || !canvas.value) return;
-  const t = ts / 1000; // Sekunden
+  const time = t / 1000;
   const w = canvas.value.clientWidth;
   const h = canvas.value.clientHeight;
 
-  // Hintergrund
   ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = cfg.bg;
   ctx.fillRect(0, 0, w, h);
 
-  // Knoten verschieben (kleine Auslenkung entlang radialer Richtung)
-  // und Kanten zeichnen (Helligkeit an der Front hochfahren)
   const { amplitude } = cfg.wave;
+  const driftX = cfg.subtleDrift ? Math.sin(time * 0.3) * cfg.subtleDrift : 0;
+  const driftY = cfg.subtleDrift ? Math.cos(time * 0.27) * cfg.subtleDrift : 0;
 
-  // optionaler „Atmungs“-Drift (sehr subtil)
-  const driftX = cfg.subtleDrift ? Math.sin(t * 0.3) * cfg.subtleDrift : 0;
-  const driftY = cfg.subtleDrift ? Math.cos(t * 0.27) * cfg.subtleDrift : 0;
-
-  // Knoten-Update
+  // Knoten aktualisieren (nur Welle + Drift; Cursor hellt nur, verschiebt nicht)
   for (let i = 0; i < nodes.length; i++) {
     const n = nodes[i];
     const dx = (n.bx + driftX) - center.x;
@@ -140,8 +192,8 @@ function animate(ts: number) {
     const dist = Math.hypot(dx, dy) || 1;
     const dirX = dx / dist, dirY = dy / dist;
 
-    const env = prefersReducedMotion ? 0 : waveEnvelope(dist, t);
-    const disp = Math.min(1, env) * amplitude; // clamp
+    const env = prefersReducedMotion ? 0 : waveEnvelope(dist, time);
+    const disp = Math.min(1, env) * amplitude;
     n.x = n.bx + dirX * disp;
     n.y = n.by + dirY * disp;
   }
@@ -152,14 +204,22 @@ function animate(ts: number) {
     const [ai, bi] = edges[e];
     const a = nodes[ai], b = nodes[bi];
 
-    // Intensität ~ Nähe der Front (nehme max der Endpunkte)
-    const da = Math.hypot((a.x - center.x), (a.y - center.y));
-    const db = Math.hypot((b.x - center.x), (b.y - center.y));
-    const ia = waveEnvelope(da, t);
-    const ib = waveEnvelope(db, t);
-    const inten = Math.min(1, Math.max(ia, ib)); // 0..1
+    // Wellen-Intensität (Endpunkte)
+    const da = Math.hypot(a.x - center.x, a.y - center.y);
+    const db = Math.hypot(b.x - center.x, b.y - center.y);
+    const iw = Math.min(1, Math.max(waveEnvelope(da, time), waveEnvelope(db, time)));
 
-    // Farbe zwischen Basis & Peak mischen
+    // Cursor-Intensität (Endpunkte)
+    let ic = 0;
+    if (mouse.active) {
+      const dam = Math.hypot(a.x - mouse.x, a.y - mouse.y);
+      const dbm = Math.hypot(b.x - mouse.x, b.y - mouse.y);
+      ic = Math.max(cursorEnvelope(dam), cursorEnvelope(dbm)); // 0..1
+      ic = Math.min(1, ic * (1 + cfg.cursor.boost));          // Boost
+    }
+
+    // kombinieren: max (kein „grau durch Überlagerung“)
+    const inten = Math.min(1, Math.max(iw, ic));
     ctx.strokeStyle = mixRGBA(cfg.lineBase, cfg.linePeak, inten);
 
     ctx.beginPath();
@@ -167,11 +227,15 @@ function animate(ts: number) {
     ctx.lineTo(b.x, b.y);
     ctx.stroke();
   }
+}
 
+/** ---------- RAF Loop ---------- */
+function animate(ts: number) {
+  render(ts);
   raf = requestAnimationFrame(animate);
 }
 
-/** ---------- Farbinterpolation (rgba strings) ---------- */
+/** ---------- Farbe utils ---------- */
 function mixRGBA(a: string, b: string, t: number) {
   const pa = parseRgba(a), pb = parseRgba(b);
   const lerp = (x: number, y: number) => x + (y - x) * t;
@@ -182,69 +246,83 @@ function mixRGBA(a: string, b: string, t: number) {
   return `rgba(${r},${g},${bl},${alpha})`;
 }
 function parseRgba(s: string): [number, number, number, number] {
-  // erwartet rgba(r,g,b,a) oder rgb(r,g,b)
   const nums = s.match(/[\d.]+/g)?.map(Number) ?? [255,255,255,1];
   if (nums.length === 3) nums.push(1);
   return nums as [number, number, number, number];
+}
+
+/** ---------- Events ---------- */
+function onPointerMove(e: PointerEvent) {
+  if (!canvas.value) return;
+  const rect = canvas.value.getBoundingClientRect();
+  mouse.x = e.clientX - rect.left;
+  mouse.y = e.clientY - rect.top;
+  mouse.active = true;
+
+  // Reduced Motion: nur bei Bewegung neu zeichnen
+  if (prefersReducedMotion) render(performance.now());
+}
+function onPointerLeave() {
+  mouse.active = false;
+  if (prefersReducedMotion) render(performance.now());
 }
 
 /** ---------- Lifecycle ---------- */
 onMounted(() => {
   resize();
   window.addEventListener("resize", resize, { passive: true });
+  canvas.value?.addEventListener("pointermove", onPointerMove, { passive: true });
+  canvas.value?.addEventListener("pointerleave", onPointerLeave, { passive: true });
+
   if (!prefersReducedMotion) raf = requestAnimationFrame(animate);
-  else drawStatic(); // statisches Netz ohne Animation
+  else render(performance.now());
 });
 onUnmounted(() => {
   window.removeEventListener("resize", resize);
+  canvas.value?.removeEventListener("pointermove", onPointerMove);
+  canvas.value?.removeEventListener("pointerleave", onPointerLeave);
   cancelAnimationFrame(raf);
 });
-
-/** ---------- Static fallback ---------- */
-function drawStatic() {
-  if (!ctx || !canvas.value) return;
-  const w = canvas.value.clientWidth;
-  const h = canvas.value.clientHeight;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = cfg.bg;
-  ctx.fillRect(0, 0, w, h);
-  ctx.lineWidth = cfg.lineWidth;
-  ctx.strokeStyle = cfg.lineBase;
-  for (const [ai, bi] of edges) {
-    const a = nodes[ai], b = nodes[bi];
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
-  }
-}
 </script>
 
 <style scoped>
 .section-welcome-services{
   position: relative;
   height: 100vh;
-  background: #000;
-  display: grid;
+  background: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   place-items: center;
   overflow: hidden;
+    margin-inline: -5px;
+  padding-inline: 0;
 }
-.section-welcome-services h1{
+.headline{
   position: relative;
   z-index: 1;
-  color: #fff;
-  font-size: clamp(2rem, 7vw, 7rem);
-  line-height: 1.02;
-  text-wrap: balance;
-  text-align: center;
-  pointer-events: none;
+  width: 100%;
+  margin-block:1rem;
 }
+.headline h1{
+    font-size: calc(var(--h1-size)*1.1);
+}
+.headline-image{
+    height:100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    margin-inline-start: 2rem;
+}
+
+
 .mesh-canvas{
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  display: block; /* vermeidet whitespace */
+  display: block;
   z-index: 0;
+  /* optional: Touch-Pan verhindern, damit der Cursor-Spot „klebt“ */
+  /* touch-action: none; */
 }
 </style>

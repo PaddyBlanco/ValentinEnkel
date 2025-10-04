@@ -34,7 +34,9 @@
     --monospace-size: 15px;
     --font-family: 'DM Sans';
     --line-width: 0.1px;
-    --line-color: rgb(0, 0, 0, 0.4);
+    --line-color: rgba(0, 0, 0, 0.4);
+    --line-color-net: rgba(0, 0, 0, 0.1);
+    --line-color-net-highlight: rgba(0, 0, 0, 0.6);
     --line-opacity: 0.4;
 }
 
@@ -43,7 +45,9 @@
         --background-color: rgb(0, 0, 0);
         --color: rgb(255, 255, 255);
         --color-hover: rgb(215, 215, 215);
-        --line-color: rgb(255, 255, 255, 0.4);
+        --line-color: rgba(255, 255, 255, 0.4);
+        --line-color-net: rgba(255,255,255, 0.1);
+        --line-color-net-highlight: rgba(255,255,255, 0.6);
     }
 }
 
