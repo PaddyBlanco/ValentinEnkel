@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting…</title>
+    <script>
+      (function() {
+        // GitHub Pages SPA redirect:
+        var l = window.location;
+        var repoBase = "/ValentinEnkel/";
+        // Falls das Repo im Subpfad liegt, stelle sicher, dass wir auf index.html unter dem Repo zeigen:
+        var newUrl = repoBase + "index.html" + "?p=" + encodeURIComponent(l.pathname.replace(repoBase, "") + l.search + l.hash);
+        window.location.replace(newUrl);
+      })();
+    </script>
+  </head>
+  <body>Redirecting…</body>
+</html>

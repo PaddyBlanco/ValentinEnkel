@@ -4,8 +4,8 @@
     font-weight: bold;
 }
 
-section{
-    padding-inline:calc((100dvw - 1800px) / 2 + 100px);
+.section{
+    padding-inline:calc((100dvw - 2200px) / 2 + 100px);
     position:relative;
 }
 
@@ -35,7 +35,11 @@ h2{
 h3 {
     font-size: var(--h3-size); 
     line-height: calc(var(--h3-size)*1.1);
+}
 
+h3 {
+    font-size: var(--h4-size); 
+    line-height: calc(var(--h4-size)*1.1);
 }
 
 
@@ -78,6 +82,19 @@ img{
 .felx-item-2{
     flex: 2;
 }
+.gap-1{
+    gap: 1rem;
+}
+.gap-2{
+    gap: 2rem;
+}
+
+.gap-3{
+    gap: 3rem;
+}
+
+
+
 .w-100{
     width: 100%;
 }
@@ -119,7 +136,7 @@ img{
 .only-mobile{
     display: inline-block;
 }
-    section{
+    .section{
         padding-inline: 20px;
     }
 }

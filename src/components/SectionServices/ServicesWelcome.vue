@@ -1,157 +1,194 @@
 <template>
   <section class="section-welcome-services">
-     <div class="text-right headline"><h1>Greifbarer Mehrwert</h1></div>
-     <div class="text-left flex-row headline">
-        <h1 class="headline">von innen heraus.</h1>
-        <ResponsiveImage name="aboutus/AboutUs-1" 
-            alt="Webentwicklung-Service bei Valentin & Enkel"
-            className="headline-image" sizes="4vw" /> 
-             <ResponsiveImage name="aboutus/AboutUs-1" 
-            alt="Webentwicklung-Service bei Valentin & Enkel"
-            className="headline-image" sizes="4vw" /> 
-             <ResponsiveImage name="aboutus/AboutUs-1" 
-            alt="Webentwicklung-Service bei Valentin & Enkel"
-            className="headline-image" sizes="4vw" />   
+    <div class="text-right headline"><h1>Greifbarer Mehrwert</h1></div>
+
+    <div class="text-left flex-row headline">
+      <h1>von innen heraus.</h1>
+      <div class="flex-item images">
+        <ResponsiveImage
+        name="contact/Contact-2"
+        alt="Roman Mitterlehner und Patrick Weiß lachen Valentin & Enkel"
+        className="headline-image"
+        sizes="4vw"
+        />
+          <ResponsiveImage
+        name="contact/Contact-1"
+        alt="Roman Mitterlehner und Patrick Weiß drinken Kaffee. Valentin & Enkel"
+        className="headline-image"
+        sizes="4vw"
+      />
+      <ResponsiveImage
+        name="contact/Contact-3"
+        alt="Roman Mitterlehner und Patrick Weiß beraten sich."
+        className="headline-image"
+        sizes="4vw"
+      />
+      </div>
+    
     </div>
-    <canvas ref="canvas" class="mesh-canvas" aria-hidden="true"></canvas>
+
+    <canvas
+      ref="canvas"
+      class="mesh-canvas"
+      :class="{ 'mesh-ready': ready }"
+      aria-hidden="true"
+    ></canvas>
   </section>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import ResponsiveImage from "../Core/ResponsiveImage.vue";
+import MeshWorker from "../../workers/meshWorker?worker";
 
-/** ---------- Look & Feel ---------- */
+
 const cfg = {
   bg: "#000000",
-  lineBase: "rgba(255,255,255,0.1)",
-  linePeak: "rgba(255,255,255,0.6)",  // nahe Weiß für Highlight
-  lineWidth: 1,
-  spacing: 32,
-  jitter: 30,
-  kNearest: 4,
-  maxDistFactor: 1.8,
-  wave: { speed: 170, band: 42, amplitude: 6, period: 8, count: 2 },
-  subtleDrift: 0.15,
-  cursor: {
-    sigma: 30,   // „Radius“ des Maus-Highlights (px, als Gauß σ)
-    boost: 0.5,   // extra Aufhellung (0..1) für im Cursorbereich
-  },
-};
+  lineBase: "rgba(255,255,255,0.10)",
+  linePeak: "rgba(255,255,255,0.6)",
+  strokePx: 1,                 // Strichstärke in CSS-Pixeln
+  spacing: 70,                 // Zielabstand zwischen Knoten (größer = schneller, luftiger)
+  jitter: 20,                  // Unregelmäßigkeit der Punkte
+  kNearest: 3,                 // max. Nachbarn pro Knoten
+  maxDistFactor: 1.25,          // maximale Kantenlänge = spacing * factor
+  wave: { speed: 250, band: 50, amplitude: 20, period: 6, count: 2 },
+  subtleDrift: 0.2,           // sehr kleiner „Atmungs“-Drift
+  cursor: { sigma: 50, boost: 1 }, // Maus-Spotlight
+  buckets: 16,                 // Quantisierung der Helligkeit: 0..16 (→ 17 Farben)
+} as const;
 
+/** ---------- Types ---------- */
 type Vec = { x: number; y: number };
-type Node = { x: number; y: number; bx: number; by: number };
-type Edge = [number, number];
 
+/** ---------- Refs & State ---------- */
 const canvas = ref<HTMLCanvasElement | null>(null);
 let ctx: CanvasRenderingContext2D | null = null;
-let nodes: Node[] = [];
-let edges: Edge[] = [];
-let raf = 0;
-let center: Vec = { x: 0, y: 0 };
-let dpr = Math.max(1, window.devicePixelRatio || 1);
-const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Mauszustand */
+let dpr = Math.max(1, window.devicePixelRatio || 1);
+let center: Vec = { x: 0, y: 0 };
+const ready = ref(false); // nur für das *erste* Mesh → Canvas fade-in
+
+// Mesh-Daten vom Worker (Typed Arrays)
+let nodesBase: Float32Array | null = null; // [bx0,by0, bx1,by1, ...]
+let edgesIdx: Uint32Array | null = null;   // [i0,j0, i1,j1, ...]
+let nodeCount = 0;
+
+// Per-Frame-Buffer (wiederverwendet → keine Allocations)
+let pos: Float32Array = new Float32Array(0);     // [x0,y0, x1,y1, ...]
+let waveI: Float32Array = new Float32Array(0);   // [i0, i1, ...]
+let curI: Float32Array = new Float32Array(0);    // [i0, i1, ...]
+
+// Maus-Spotlight
 const mouse = { x: Infinity, y: Infinity, active: false };
 
-/** ---------- Unregelmäßiges, planres Netz ---------- */
-function buildMeshIrregular(w: number, h: number) {
-  nodes = [];
-  edges = [];
+// Reduced Motion
+const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const s = cfg.spacing;
-  const cols = Math.ceil(w / s) + 2;
-  const rows = Math.ceil(h / s) + 2;
-  const offsetX = -s, offsetY = -s;
+// Worker-Handling
+let worker: Worker | null = null;
+let buildSeq = 0;       // ID des neuesten Build-Auftrags
+let raf = 0;
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const baseX = offsetX + c * s;
-      const baseY = offsetY + r * s;
-      const jx = (Math.random() * 2 - 1) * cfg.jitter;
-      const jy = (Math.random() * 2 - 1) * cfg.jitter;
-      const x = baseX + jx, y = baseY + jy;
-      nodes.push({ x, y, bx: x, by: y });
-    }
+// Resize: robust & ruhig
+let ro: ResizeObserver | null = null;
+let resizeTimer: number | null = null;
+const idle = (cb: () => void) =>
+  (window as any).requestIdleCallback
+    ? (window as any).requestIdleCallback(cb, { timeout: 250 })
+    : setTimeout(cb, 0);
+
+/** ---------- Farbpalette (buckets) ---------- */
+let palette: string[] = [];
+function parseRgba(s: string): [number, number, number, number] {
+  const m = s.match(/[\d.]+/g)?.map(Number) ?? [255, 255, 255, 1];
+  if (m.length === 3) m.push(1);
+  return m as [number, number, number, number];
+}
+function makePalette(base: string, peak: string, steps: number) {
+  const a = parseRgba(base), b = parseRgba(peak);
+  const lerp = (x: number, y: number, t: number) => x + (y - x) * t;
+  const out: string[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const r = Math.round(lerp(a[0], b[0], t));
+    const g = Math.round(lerp(a[1], b[1], t));
+    const bl = Math.round(lerp(a[2], b[2], t));
+    const al = lerp(a[3], b[3], t);
+    out.push(`rgba(${r},${g},${bl},${al})`);
   }
-
-  const maxDist = s * cfg.maxDistFactor;
-
-  for (let i = 0; i < nodes.length; i++) {
-    const a = nodes[i];
-    const dists: { j: number; d: number }[] = [];
-    for (let j = 0; j < nodes.length; j++) {
-      if (i === j) continue;
-      const b = nodes[j];
-      const d = Math.hypot(a.x - b.x, a.y - b.y);
-      if (d > 0 && d <= maxDist) dists.push({ j, d });
-    }
-    dists.sort((A, B) => A.d - B.d);
-
-    let added = 0;
-    for (const { j } of dists) {
-      if (added >= cfg.kNearest) break;
-      const e: Edge = i < j ? [i, j] : [j, i];
-      if (edgeExists(edges, e)) continue;
-      if (!intersectsAnyExistingEdge(e, edges)) {
-        edges.push(e);
-        added++;
-      }
-    }
-  }
-}
-function edgeExists(list: Edge[], [u, v]: Edge) {
-  for (let k = 0; k < list.length; k++) {
-    const [a, b] = list[k];
-    if ((a === u && b === v) || (a === v && b === u)) return true;
-  }
-  return false;
-}
-function intersectsAnyExistingEdge(e: Edge, list: Edge[]) {
-  const [u, v] = e;
-  const A = nodes[u], B = nodes[v];
-  for (let k = 0; k < list.length; k++) {
-    const [m, n] = list[k];
-    if (u === m || u === n || v === m || v === n) continue;
-    const C = nodes[m], D = nodes[n];
-    if (segmentsIntersect(A, B, C, D)) return true;
-  }
-  return false;
-}
-function segmentsIntersect(a: Vec, b: Vec, c: Vec, d: Vec) {
-  const o1 = orient(a, b, c), o2 = orient(a, b, d);
-  const o3 = orient(c, d, a), o4 = orient(c, d, b);
-  if (o1 === 0 && onSegment(a, c, b)) return true;
-  if (o2 === 0 && onSegment(a, d, b)) return true;
-  if (o3 === 0 && onSegment(c, a, d)) return true;
-  if (o4 === 0 && onSegment(c, b, d)) return true;
-  return (o1 > 0 && o2 < 0 || o1 < 0 && o2 > 0) &&
-         (o3 > 0 && o4 < 0 || o3 < 0 && o4 > 0);
-}
-function orient(p: Vec, q: Vec, r: Vec) {
-  return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-}
-function onSegment(p: Vec, q: Vec, r: Vec) {
-  return Math.min(p.x, r.x) <= q.x && q.x <= Math.max(p.x, r.x) &&
-         Math.min(p.y, r.y) <= q.y && q.y <= Math.max(p.y, r.y);
+  return out;
 }
 
-/** ---------- Canvas & DPR ---------- */
+/** ---------- Worker ---------- */
+function attachWorker() {
+  worker = new MeshWorker();
+  worker.onmessage = (e: MessageEvent) => {
+    const msg = e.data as {
+      type: "mesh";
+      nodes: ArrayBuffer;
+      edges: ArrayBuffer;
+      seq?: number;
+    };
+    if (!msg || msg.type !== "mesh") return;
+    if (typeof msg.seq === "number" && msg.seq < buildSeq) return; // veraltete Antwort
+
+    nodesBase = new Float32Array(msg.nodes);
+    edgesIdx = new Uint32Array(msg.edges);
+    nodeCount = nodesBase.length / 2;
+
+    // Frame-Buffer neu dimensionieren (einmalig)
+    pos = new Float32Array(nodesBase.length);
+    waveI = new Float32Array(nodeCount);
+    curI = new Float32Array(nodeCount);
+
+    // Erstes Mesh? → Canvas einblenden
+    ready.value = true;
+  };
+  worker.onerror = () => {
+    // Fallback: kein Mesh → nur schwarzer Hintergrund
+    nodesBase = null;
+    edgesIdx = null;
+  };
+}
+
+function buildInWorker() {
+  if (!canvas.value || !worker) return;
+  const { clientWidth: w, clientHeight: h } = canvas.value;
+  const seq = ++buildSeq; // Build-ID
+
+  worker.postMessage({
+    type: "build",
+    w,
+    h,
+    spacing: cfg.spacing,
+    jitter: cfg.jitter,
+    kNearest: cfg.kNearest,
+    maxDistFactor: cfg.maxDistFactor,
+    seq,
+  });
+}
+
+/** ---------- Canvas / DPR ---------- */
 function resize() {
   if (!canvas.value) return;
   const { clientWidth, clientHeight } = canvas.value;
   dpr = Math.max(1, window.devicePixelRatio || 1);
-  canvas.value.width  = Math.floor(clientWidth * dpr);
+
+  canvas.value.width = Math.floor(clientWidth * dpr);
   canvas.value.height = Math.floor(clientHeight * dpr);
+
   ctx = canvas.value.getContext("2d");
   if (!ctx) return;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
   center = { x: clientWidth / 2, y: clientHeight / 2 };
-  buildMeshIrregular(clientWidth, clientHeight);
+
+  // Neu bauen – aber nicht aggressiv (Debounce + Idle)
+  if (resizeTimer) window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(() => idle(buildInWorker), 160);
 }
 
-/** ---------- Hüllkurven ---------- */
+/** ---------- Envelopes ---------- */
 function waveEnvelope(distance: number, t: number) {
   const { speed, band, period, count } = cfg.wave;
   let intensity = 0;
@@ -170,85 +207,96 @@ function cursorEnvelope(distance: number) {
 }
 
 /** ---------- Render ---------- */
-function render(t: number) {
+function render(ts: number) {
   if (!ctx || !canvas.value) return;
-  const time = t / 1000;
+  const t = ts / 1000;
   const w = canvas.value.clientWidth;
   const h = canvas.value.clientHeight;
 
+  // Hintergrund
   ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = cfg.bg;
   ctx.fillRect(0, 0, w, h);
 
-  const { amplitude } = cfg.wave;
-  const driftX = cfg.subtleDrift ? Math.sin(time * 0.3) * cfg.subtleDrift : 0;
-  const driftY = cfg.subtleDrift ? Math.cos(time * 0.27) * cfg.subtleDrift : 0;
+  if (!nodesBase || !edgesIdx) return;
 
-  // Knoten aktualisieren (nur Welle + Drift; Cursor hellt nur, verschiebt nicht)
-  for (let i = 0; i < nodes.length; i++) {
-    const n = nodes[i];
-    const dx = (n.bx + driftX) - center.x;
-    const dy = (n.by + driftY) - center.y;
+  // 1) Pro Node: Position & Intensitäten berechnen (einmalig)
+  const driftX = cfg.subtleDrift ? Math.sin(t * 0.3) * cfg.subtleDrift : 0;
+  const driftY = cfg.subtleDrift ? Math.cos(t * 0.27) * cfg.subtleDrift : 0;
+  const amp = prefersReducedMotion ? 0 : cfg.wave.amplitude;
+
+  for (let i = 0, pn = 0; i < nodeCount; i++, pn += 2) {
+    const bx = nodesBase[pn] + driftX;
+    const by = nodesBase[pn + 1] + driftY;
+
+    // Richtung von der Mitte
+    const dx = bx - center.x;
+    const dy = by - center.y;
     const dist = Math.hypot(dx, dy) || 1;
-    const dirX = dx / dist, dirY = dy / dist;
+    const dirX = dx / dist;
+    const dirY = dy / dist;
 
-    const env = prefersReducedMotion ? 0 : waveEnvelope(dist, time);
-    const disp = Math.min(1, env) * amplitude;
-    n.x = n.bx + dirX * disp;
-    n.y = n.by + dirY * disp;
+    // Welle
+    const wEnv = amp * Math.min(1, waveEnvelope(dist, t));
+    const x = bx + dirX * wEnv;
+    const y = by + dirY * wEnv;
+
+    pos[pn] = x;
+    pos[pn + 1] = y;
+
+    // Intensitäten (getrennt halten → max() pro Kante)
+    waveI[i] = Math.min(1, waveEnvelope(dist, t));
+    if (mouse.active) {
+      const dm = Math.hypot(x - mouse.x, y - mouse.y);
+      const ce = cursorEnvelope(dm) * (1 + cfg.cursor.boost);
+      curI[i] = ce > 1 ? 1 : ce;
+    } else {
+      curI[i] = 0;
+    }
   }
 
-  // Linien zeichnen
-  ctx.lineWidth = cfg.lineWidth;
-  for (let e = 0; e < edges.length; e++) {
-    const [ai, bi] = edges[e];
-    const a = nodes[ai], b = nodes[bi];
+  // 2) Linien in Buckets sammeln → je Bucket einmal stroken
+  const steps = cfg.buckets;
+  const paths: (Path2D | null)[] = Array(steps + 1).fill(null);
+  const getPath = (idx: number) => (paths[idx] ??= new Path2D());
 
-    // Wellen-Intensität (Endpunkte)
-    const da = Math.hypot(a.x - center.x, a.y - center.y);
-    const db = Math.hypot(b.x - center.x, b.y - center.y);
-    const iw = Math.min(1, Math.max(waveEnvelope(da, time), waveEnvelope(db, time)));
+  for (let k = 0; k < edgesIdx.length; k += 2) {
+    const ai = edgesIdx[k]!;
+    const bi = edgesIdx[k + 1]!;
 
-    // Cursor-Intensität (Endpunkte)
-    let ic = 0;
-    if (mouse.active) {
-      const dam = Math.hypot(a.x - mouse.x, a.y - mouse.y);
-      const dbm = Math.hypot(b.x - mouse.x, b.y - mouse.y);
-      ic = Math.max(cursorEnvelope(dam), cursorEnvelope(dbm)); // 0..1
-      ic = Math.min(1, ic * (1 + cfg.cursor.boost));          // Boost
-    }
+    const a2 = ai * 2;
+    const b2 = bi * 2;
 
-    // kombinieren: max (kein „grau durch Überlagerung“)
-    const inten = Math.min(1, Math.max(iw, ic));
-    ctx.strokeStyle = mixRGBA(cfg.lineBase, cfg.linePeak, inten);
+    const ax = pos[a2], ay = pos[a2 + 1];
+    const bx2 = pos[b2], by2 = pos[b2 + 1];
 
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y);
-    ctx.lineTo(b.x, b.y);
-    ctx.stroke();
+    // Helligkeit: max aus Wave- und Cursor-Anteil der Endpunkte
+    const iw = waveI[ai] > waveI[bi] ? waveI[ai] : waveI[bi];
+    const ic = curI[ai] > curI[bi] ? curI[ai] : curI[bi];
+    let inten = iw > ic ? iw : ic;
+    if (inten < 0) inten = 0;
+    if (inten > 1) inten = 1;
+
+    const bucket = Math.round(inten * steps);
+    const p = getPath(bucket);
+    p.moveTo(ax, ay);
+    p.lineTo(bx2, by2);
+  }
+
+  // 3) Strokes pro Bucket ausgeben
+  ctx.lineWidth = cfg.strokePx;
+  for (let i = 0; i <= steps; i++) {
+    const p = paths[i];
+    if (!p) continue;
+    ctx.strokeStyle = palette[i]!;
+    ctx.stroke(p);
   }
 }
 
 /** ---------- RAF Loop ---------- */
-function animate(ts: number) {
+function loop(ts: number) {
   render(ts);
-  raf = requestAnimationFrame(animate);
-}
-
-/** ---------- Farbe utils ---------- */
-function mixRGBA(a: string, b: string, t: number) {
-  const pa = parseRgba(a), pb = parseRgba(b);
-  const lerp = (x: number, y: number) => x + (y - x) * t;
-  const r = Math.round(lerp(pa[0], pb[0]));
-  const g = Math.round(lerp(pa[1], pb[1]));
-  const bl = Math.round(lerp(pa[2], pb[2]));
-  const alpha = lerp(pa[3], pb[3]);
-  return `rgba(${r},${g},${bl},${alpha})`;
-}
-function parseRgba(s: string): [number, number, number, number] {
-  const nums = s.match(/[\d.]+/g)?.map(Number) ?? [255,255,255,1];
-  if (nums.length === 3) nums.push(1);
-  return nums as [number, number, number, number];
+  raf = requestAnimationFrame(loop);
 }
 
 /** ---------- Events ---------- */
@@ -258,8 +306,6 @@ function onPointerMove(e: PointerEvent) {
   mouse.x = e.clientX - rect.left;
   mouse.y = e.clientY - rect.top;
   mouse.active = true;
-
-  // Reduced Motion: nur bei Bewegung neu zeichnen
   if (prefersReducedMotion) render(performance.now());
 }
 function onPointerLeave() {
@@ -269,19 +315,31 @@ function onPointerLeave() {
 
 /** ---------- Lifecycle ---------- */
 onMounted(() => {
+  palette = makePalette(cfg.lineBase, cfg.linePeak, cfg.buckets);
+  attachWorker();
+  // Canvas initialisieren
   resize();
-  window.addEventListener("resize", resize, { passive: true });
+  // Erstes Mesh asynchron bauen
+  buildInWorker();
+
+  // Resize reaktiv & „sanft“
+  ro = new ResizeObserver(() => idle(resize));
+  if (canvas.value) ro.observe(canvas.value);
+
+  // Maus
   canvas.value?.addEventListener("pointermove", onPointerMove, { passive: true });
   canvas.value?.addEventListener("pointerleave", onPointerLeave, { passive: true });
 
-  if (!prefersReducedMotion) raf = requestAnimationFrame(animate);
-  else render(performance.now());
+  // Start
+  raf = requestAnimationFrame(loop);
 });
+
 onUnmounted(() => {
-  window.removeEventListener("resize", resize);
+  ro?.disconnect();
   canvas.value?.removeEventListener("pointermove", onPointerMove);
   canvas.value?.removeEventListener("pointerleave", onPointerLeave);
   cancelAnimationFrame(raf);
+  worker?.terminate();
 });
 </script>
 
@@ -289,32 +347,33 @@ onUnmounted(() => {
 .section-welcome-services{
   position: relative;
   height: 100vh;
-  background: var(--background-color);
+  background: var(--background-color, #000);
   display: flex;
   flex-direction: column;
   justify-content: center;
   place-items: center;
   overflow: hidden;
-    margin-inline: -5px;
+  margin-inline: -5px;
   padding-inline: 0;
 }
 .headline{
   position: relative;
   z-index: 1;
   width: 100%;
-  margin-block:1rem;
+  margin-block: 1rem;
+  pointer-events: none;
 }
 .headline h1{
-    font-size: calc(var(--h1-size)*1.1);
+  font-size: calc(var(--h1-size, 4rem) * 1.1);
 }
 .headline-image{
-    height:100%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    margin-inline-start: 2rem;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  margin-inline-start: 2rem;
 }
 
-
+/* Canvas blendet ein, sobald das erste Mesh da ist */
 .mesh-canvas{
   position: absolute;
   inset: 0;
@@ -322,7 +381,29 @@ onUnmounted(() => {
   height: 100%;
   display: block;
   z-index: 0;
-  /* optional: Touch-Pan verhindern, damit der Cursor-Spot „klebt“ */
-  /* touch-action: none; */
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.mesh-canvas.mesh-ready{ opacity: 1; }
+
+
+@media (max-width:1000px) {
+
+  .section-welcome-services{
+    margin-inline:0;
+  }
+
+  .headline h1{
+    font-size: var(--h1-size);
+    margin-block:5vh;
+  }
+  .headline-image{
+  height: var(--h1-size);
+  margin-inline: 1rem;
+}
+.images{
+  width: 100%;
+  text-align: center;
+}
 }
 </style>

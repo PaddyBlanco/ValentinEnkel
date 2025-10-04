@@ -1,6 +1,6 @@
 <template>
 
-  <section class="section-approach" id="approach-snap">
+  <section class="section section-approach" id="approach-snap">
     <div class="overlay-header">
       <h1>Unser Ansatz.</h1>
       <div class="line-h"></div>

@@ -31,6 +31,7 @@
     --h1-size: 120px;
     --h2-size: 85px;
     --h3-size: 63px;
+    --h4-size: 40px;
     --monospace-size: 15px;
     --font-family: 'DM Sans';
     --line-width: 0.1px;
@@ -58,6 +59,7 @@
         --h1-size: 90px;
         --h2-size: 70px;
         --h3-size: 50px;
+        --h4-size: 30px;
 
     }
 }
@@ -71,6 +73,7 @@
         --h1-size: 65px;
         --h2-size: 50px;
         --h3-size: 40px;
+        --h4-size: 0.2s;
     }
 }
 

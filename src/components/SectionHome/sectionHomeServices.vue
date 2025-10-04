@@ -1,5 +1,5 @@
 <template>
-  <section class="section-services">
+  <section class="section section-services">
     <h1 class="reveal right" v-inview>Was wir anbieten.</h1>
     <div class="text-container reveal right" v-inview>
       <p>Wir sind ein technologieorientiertes Beratungs- und Entwicklungsunternehmen für
@@ -9,11 +9,11 @@
       <button v-inview class="btn reveal up">Services</button>
     </div>
 <div class="images-container">
-   <ResponsiveImage name="services/Services-1" alt="Webentwicklung-Service bei Valentin & Enkel"
+   <ResponsiveImage name="services/Services-1" alt="Gescheftsführer Valentin & Enkel"
       className="s-image-1 reveal left" v-inview sizes="9vw" />
-    <ResponsiveImage name="services/Services-2" alt="Webentwicklung-Service bei Valentin & Enkel"
+    <ResponsiveImage name="services/Services-2" alt="Patrick Weiß und Roman Mitterlehner in einer Maschine"
       className="s-image-2 reveal left" v-inview sizes="12vw" />
-    <ResponsiveImage name="services/Services-3" alt="Webentwicklung-Service bei Valentin & Enkel"
+    <ResponsiveImage name="services/Services-3" alt="Besprechung in der Industrie"
       className="s-image-3 reveal left" v-inview sizes="10vw" />
 </div>
  

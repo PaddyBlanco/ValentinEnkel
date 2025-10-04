@@ -5,7 +5,7 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
 
 <template>
 
-    <section>
+    <section class="section">
         <div class="section-aboutus flex-row">
             <div class="image-container text-right flex-bottom">
                 <div class="only-mobile w-66">

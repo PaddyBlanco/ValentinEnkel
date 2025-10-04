@@ -1,6 +1,6 @@
 <template>
     <CompAnimatedGradient/>
-    <section class="welcome-section">
+    <section class="section welcome-section">
         <div class="reveal fade welcome-text" v-inview style="--rev-delay:150ms">
         <TextRotatorFader :words="['Lösungen', 'Gestaltung', 'Fortschritt', 'Innovation', 'Ideen']"
                 :interval="2500"

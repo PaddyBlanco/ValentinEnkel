@@ -43,9 +43,15 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const showNav = ref(false)
 const firstLink = ref<HTMLAnchorElement | null>(null)
+const route = useRoute();
+
+watch(() => route.fullPath, () => {
+  closeNav()
+})
 
 const openNav = async () => {
   if (showNav.value) return

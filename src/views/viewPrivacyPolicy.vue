@@ -1,5 +1,5 @@
 <template>
-  <section class="centered-content">
+  <section class="section centered-content">
     <h1>Datenschutzerklärung</h1>
 
     <p>

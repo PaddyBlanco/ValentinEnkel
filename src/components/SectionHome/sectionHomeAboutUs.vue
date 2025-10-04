@@ -5,7 +5,7 @@ import ResponsiveImage from '../Core/ResponsiveImage.vue';
 
 <template>
 
-    <section>
+    <section class="section">
         <div class="section-aboutus flex-row">
             <div class="flex-item text-right flex-bottom">
                 <ResponsiveImage name="aboutus/AboutUs-1" alt="Webentwicklung-Service bei Valentin & Enkel"
